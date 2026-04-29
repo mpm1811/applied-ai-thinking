@@ -25,6 +25,21 @@ Three drop-in [Claude Code skills](https://claude.com/claude-code) packaged as `
 
 ## Quick install
 
+Pick the path that matches where you use Claude. The same `.skill` bundle works in both — only the install location differs.
+
+### Option A — Claude.ai (web & desktop apps)
+
+The fastest path. Upload the `.skill` file directly through the Claude UI; no shell or filesystem access needed.
+
+1. Download the `.skill` archive(s) you want from the [Releases](https://github.com/mpm1811/applied-ai-thinking/releases) page or the repo root (right-click → "Save link as…").
+2. Open Claude → **Settings** → **Capabilities** → **Skills**.
+3. Click **Upload skill** and select the `.skill` file. Repeat for each one you want.
+4. Toggle the skill on. It will auto-trigger from matching prompts.
+
+> **Note for daily-task-tracker** — Claude.ai is where this skill shines, because the Fathom, Microsoft 365, Zoom Chat, and Notion MCP connectors live in Claude's settings. Connect those four under **Settings → Connectors** before running the skill.
+
+### Option B — Claude Code (CLI / IDE)
+
 ```bash
 # Clone or download
 git clone https://github.com/mpm1811/applied-ai-thinking.git
@@ -37,6 +52,12 @@ unzip refine-prompts.skill         -d ~/.claude/skills/
 ```
 
 Restart Claude Code. The skills will auto-trigger on matching prompts, or invoke them explicitly with `/brainstorm-companion`, `/daily-task-tracker`, `/refine-prompts`.
+
+> **Project-scoped install (Claude Code only)** — drop the extracted skill folder into `<project>/.claude/skills/` instead of `~/.claude/skills/` to scope it to a single project.
+
+### Option C — Anthropic API / Agent SDK
+
+If you're invoking Claude via the API, mount the extracted skill folder at the path you pass to the [Agent Skills](https://docs.anthropic.com/en/docs/claude-code/skills) loader. The `.skill` archive is just a zipped folder — extract it and point the SDK at the resulting directory.
 
 ---
 
