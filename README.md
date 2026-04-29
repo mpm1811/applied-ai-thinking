@@ -1,63 +1,181 @@
-# Applied AI Thinking — Skills
+# Applied AI Thinking
 
-A small collection of Claude Code skills (`.skill` archives) packaged for personal use. Each `.skill` file is a zipped bundle containing a `SKILL.md` and any reference files; install by extracting into your skills directory or by importing through Claude Code.
+> A small, curated set of **Claude Code skills** that turn Claude into a sharper thinking partner, an assistant that keeps your task list in sync with your meetings & inbox, and a prompt engineer that follows the 2026 best-practices.
 
-## Skills in this folder
-
-### 1. `brainstorm-companion.skill`
-
-**What it does.** Turns Claude into a candid, PhD-level thinking partner for deep conversation, ideation, strategy stress-testing, and exploring tradeoffs. Treats the user as a domain expert, gives honest unsolicited judgments instead of agreeing by default, and aggressively grounds claims in current sources rather than relying on training-era knowledge. Stays in pure conversation mode — only produces mind maps or markdown captures when explicitly asked.
-
-**Trigger phrases.** "let's think through", "help me explore", "play devil's advocate", "what are we missing", "let's workshop this", or any request to brainstorm/ideate/riff.
-
-**Required tools / MCP connections.**
-- **Web search** (built-in `WebSearch` / `WebFetch`) — used as a reflex throughout the conversation to ground claims and avoid stale knowledge. This is the only hard dependency.
-- No external MCP servers required.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-skills-7c5cff)](https://claude.com/claude-code)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
+[![Skills](https://img.shields.io/badge/skills-3-blue)](#skills)
 
 ---
 
-### 2. `daily-task-tracker.skill`
+## What is this?
 
-**What it does.** Scans your Fathom meeting recordings, Zoom messages, and Outlook emails for action items assigned to you, then creates and updates tasks in a Notion task database. Designed to be run as a periodic sweep so nothing falls through the cracks. On first run it auto-bootstraps: pulls your identity from Microsoft 365, optionally creates a Notion workspace for you, and saves your work-stream and channel preferences to `memory/task_tracker_config.md`.
+Three drop-in [Claude Code skills](https://claude.com/claude-code) packaged as `.skill` archives. Each one is a single-file zipped bundle (`SKILL.md` + optional reference files) that Claude Code auto-loads from your skills directory and triggers based on the user's intent.
 
-**Trigger phrases.** "scan for new tasks", "update my task tracker", "what do I need to do", "run task tracker", "find action items", "sweep my emails/meetings/Zoom".
+**Why these three?** They cover the three modes of work I reach for daily:
 
-**Required MCP connections.**
-- **Fathom** (`claude_ai_Fathom`) — `list_meetings`, `get_meeting_summary`, `get_meeting_transcript` for pulling action items out of meeting recordings.
-- **Microsoft 365** (`claude_ai_Microsoft_365`) — `read_resource` (to auto-fetch the user's identity) and `outlook_email_search` for sweeping inbox threads.
-- **Zoom Chat** (`zoom-chat`) — `scan_direct_messages`, `get_channel_messages`, `list_channels`, `analyze_message_relevance` for surfacing @mentions and pending threads.
-- **Notion** (`claude_ai_Notion`) — `notion-create-pages`, `notion-create-database`, `notion-fetch`, `notion-query-database-view`, `notion-update-page` for managing the task and run-log databases.
-
-All four MCP servers must be connected for the full sweep. The skill degrades gracefully if one source is unavailable, but a complete run depends on all of them.
+| Mode | Skill | One-liner |
+|---|---|---|
+| 🧠 **Think** | [`brainstorm-companion`](#-brainstorm-companion) | A PhD-level peer that argues with you, not a yes-machine |
+| ✅ **Do** | [`daily-task-tracker`](#-daily-task-tracker) | Sweeps meetings + chats + email into a Notion task list |
+| ✍️ **Write** | [`refine-prompts`](#-refine-prompts) | Refines any prompt to current Claude best-practices |
 
 ---
 
-### 3. `refine-prompts.skill`
-
-**What it does.** Refines an existing prompt or drafts a new one from a described goal, applying the 2026 prompt-engineering best practices for Claude Opus 4.7, Sonnet 4.6, and Haiku 4.5. Output is a clean, copy-paste-ready prompt in a fenced code block — no preamble, no change log, no commentary unless explicitly requested. Includes reference files (`checklist.md`, `patterns.md`, `antipatterns.md`) covering structural patterns, common failure modes, and concrete examples for extraction/classification/generation/agentic tasks.
-
-**Trigger phrases.** "refine", "improve", "rewrite", "fix", "polish", "level up" a prompt; "write a prompt for…", "prompt engineering", "make a better system prompt", or pasting a prompt with frustration that it isn't working.
-
-**Required tools / MCP connections.**
-- None. This skill is self-contained — it operates purely on the prompt text the user provides and its bundled reference files.
-
----
-
-## Installing a skill
-
-These are zipped skill bundles. To use one in Claude Code:
+## Quick install
 
 ```bash
-# Extract into your user skills directory
-unzip brainstorm-companion.skill -d ~/.claude/skills/
+# Clone or download
+git clone https://github.com/mpm1811/applied-ai-thinking.git
+cd applied-ai-thinking
+
+# Extract whichever skills you want into your Claude Code skills directory
+unzip brainstorm-companion.skill   -d ~/.claude/skills/
+unzip daily-task-tracker.skill     -d ~/.claude/skills/
+unzip refine-prompts.skill         -d ~/.claude/skills/
 ```
 
-Then invoke it by name, or let Claude trigger it automatically based on the description in `SKILL.md`.
+Restart Claude Code. The skills will auto-trigger on matching prompts, or invoke them explicitly with `/brainstorm-companion`, `/daily-task-tracker`, `/refine-prompts`.
 
-## Quick reference — MCP requirements at a glance
+---
+
+## Skills
+
+### 🧠 brainstorm-companion
+
+Turns Claude into a candid, PhD-level thinking partner. Treats you as a domain expert, gives honest unsolicited judgment instead of agreeing by default, and uses web search reflexively to ground claims in current sources rather than training-era knowledge. Stays in conversation mode — no auto-generated mind maps unless you ask.
+
+**Use it when** you say things like *"let's think through…", "play devil's advocate", "what are we missing", "let's workshop this"*.
+
+**Example interaction**
+```
+You: I'm thinking about pivoting our pricing from per-seat to usage-based.
+Claude: Before I weigh in — what behavior are you trying to change with the pivot?
+        Existing customers expanding seats they don't use? Or new customers
+        balking at the entry price? Those lead to different pricing shapes.
+        [searches: usage-based pricing transitions B2B SaaS 2025]
+        Two specific failure patterns I'd want you to defend against...
+```
+
+**Required tools**
+- Built-in `WebSearch` / `WebFetch`. No external MCP needed.
+
+---
+
+### ✅ daily-task-tracker
+
+Scans your Fathom meeting recordings, Zoom messages, and Outlook emails for action items addressed to you, then creates and updates tasks in a Notion database. Designed as a periodic sweep so nothing falls through the cracks. First run auto-bootstraps: pulls your identity from Microsoft 365, optionally creates a Notion workspace, and saves your work-stream preferences.
+
+**Use it when** you say *"scan for new tasks", "what do I need to do", "run task tracker", "sweep my inbox"*.
+
+**Example interaction**
+```
+You: run task tracker
+Claude: Scanning for new items since 2026-04-28 09:14…
+        ✓ Fathom: 3 meetings reviewed → 2 action items for you
+        ✓ Outlook: 47 emails scanned → 1 new task, 2 updates
+        ✓ Zoom: 4 channels + DMs → 1 thread needs your reply
+
+        Created TSK-014: "Reply to vendor SLA proposal"  (High)
+        Updated TSK-009: status → Blocked (waiting on legal)
+```
+
+**Required MCP connections** — all four needed for a full sweep:
+- **Fathom** — `list_meetings`, `get_meeting_summary`, `get_meeting_transcript`
+- **Microsoft 365** — `read_resource`, `outlook_email_search`
+- **Zoom Chat** — `scan_direct_messages`, `get_channel_messages`, `list_channels`, `analyze_message_relevance`
+- **Notion** — `notion-create-pages`, `notion-create-database`, `notion-fetch`, `notion-query-database-view`, `notion-update-page`
+
+The skill degrades gracefully if one source is unavailable.
+
+---
+
+### ✍️ refine-prompts
+
+Refines an existing prompt or drafts one from a described goal, applying the 2026 prompt-engineering best practices for Claude Opus 4.7, Sonnet 4.6, and Haiku 4.5. Default output is a clean, copy-paste-ready prompt in a fenced code block — no preamble, no change log. Bundled reference files cover structural patterns, common failure modes, and worked examples.
+
+**Use it when** you say *"refine this prompt", "improve this", "write a prompt that…", "rewrite this so it actually works"*.
+
+**Example interaction**
+````
+You: refine this — "summarize this article and tell me the main points"
+
+Claude:
+<task>
+Summarize the article below and identify its main points.
+</task>
+
+<article>
+{{ARTICLE_TEXT}}
+</article>
+
+<instructions>
+Produce two sections:
+1. A 3-4 sentence summary that captures the article's overall argument.
+2. A numbered list of distinct main points, one sentence each.
+
+Quote a short phrase (under 10 words) when a point relies on specific wording.
+If the article is too short to identify distinct points, say so rather than inventing them.
+</instructions>
+````
+
+**Required tools**
+- None. Self-contained.
+
+---
+
+## MCP requirements at a glance
 
 | Skill | Web search | Fathom | Microsoft 365 | Zoom Chat | Notion |
-|---|---|---|---|---|---|
-| brainstorm-companion | required | — | — | — | — |
-| daily-task-tracker | — | required | required | required | required |
+|---|:---:|:---:|:---:|:---:|:---:|
+| brainstorm-companion | ✅ | — | — | — | — |
+| daily-task-tracker | — | ✅ | ✅ | ✅ | ✅ |
 | refine-prompts | — | — | — | — | — |
+
+---
+
+## Repository layout
+
+```
+applied-ai-thinking/
+├── README.md
+├── LICENSE                          # MIT
+├── brainstorm-companion.skill       # zipped SKILL bundle
+├── daily-task-tracker.skill         # zipped SKILL bundle
+└── refine-prompts.skill             # zipped SKILL bundle (with references/)
+```
+
+Each `.skill` file is just a renamed `.zip`. To inspect a bundle without installing it:
+
+```bash
+unzip -l brainstorm-companion.skill
+unzip -p brainstorm-companion.skill brainstorm-companion/SKILL.md | less
+```
+
+---
+
+## Contributing
+
+PRs and issues welcome — see the [good first issues](https://github.com/mpm1811/applied-ai-thinking/labels/good%20first%20issue) for places to start.
+
+If you want to add a new skill:
+1. Author it as a folder containing `SKILL.md` (and any `references/`).
+2. Test it locally by symlinking into `~/.claude/skills/`.
+3. Zip it: `cd your-skill && zip -r ../your-skill.skill .`
+4. Open a PR with the `.skill` archive and a short description in the README.
+
+For changes to existing skills, edit the contents of the bundle then repackage:
+
+```bash
+unzip refine-prompts.skill -d /tmp/refine
+# edit /tmp/refine/refine-prompts/SKILL.md
+cd /tmp/refine && zip -r refine-prompts.skill refine-prompts/
+mv refine-prompts.skill /path/to/this/repo/
+```
+
+---
+
+## License
+
+[MIT](LICENSE) — use it, fork it, ship it.
